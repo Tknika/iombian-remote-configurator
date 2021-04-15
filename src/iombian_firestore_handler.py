@@ -21,6 +21,9 @@ class IoMBianFirestoreHandler(FirestoreHandler):
 
     def initialize_db(self):
         super().initialize_db()
+        if not self.db:
+            logger.error("DB connection not ready")
+            return
         self.devices_path = f"users/{self.user_id}/devices"
         if not self.device_snapshot:
             self.device_snapshot = self.db.collection(self.devices_path).document(self.device_id).on_snapshot(self.device_update_callback)

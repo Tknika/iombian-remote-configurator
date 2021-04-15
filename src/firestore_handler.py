@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 class FirestoreHandler(object):
 
     TOKEN_REFRESH_TIME_MIN = 58
+    TOKEN_RETRY_TIME_MIN = 2
 
     def __init__(self, api_key, project_id, refresh_token, on_expired_token):
         self.api_key = api_key
@@ -24,11 +25,14 @@ class FirestoreHandler(object):
         self.db = None
 
     def initialize_db(self):
-        if not self.db:
-            logger.debug("Initializing Firestore database connection")
-            self.db = Client(self.project_id, self.__get_credentials())
-            self.refresh_expired_token_timer = threading.Timer(self.TOKEN_REFRESH_TIME_MIN*60.0, self.on_expired_token)
-            self.refresh_expired_token_timer.start()
+        if self.db:
+            return
+        logger.debug("Initializing Firestore database connection")
+        creds = self.__get_credentials()
+        if creds:
+            self.db = Client(self.project_id, creds)
+        self.refresh_expired_token_timer = threading.Timer(self.TOKEN_REFRESH_TIME_MIN*60.0 if creds else self.TOKEN_RETRY_TIME_MIN*60.0, self.on_expired_token)
+        self.refresh_expired_token_timer.start()
 
     def stop_db(self):
         logger.debug("Stopping Firestore database connection")
@@ -39,8 +43,12 @@ class FirestoreHandler(object):
 
     def __get_credentials(self):
         user_id, token_id = self.__get_ids()
+        if not user_id or not token_id:
+           logger.warn(f"Invalid user and token ids ({user_id}, {token_id})")
+           return None
         self.user_id = user_id
-        return Credentials(token_id, self.refresh_token)
+        creds = Credentials(token_id, self.refresh_token)
+        return creds
 
     def __get_ids(self):
         token_response = self.__get_token_response()
