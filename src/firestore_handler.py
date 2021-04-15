@@ -60,5 +60,8 @@ class FirestoreHandler(object):
         request_ref = f"https://securetoken.googleapis.com/v1/token?key={self.api_key}"
         headers = {"content-type": "application/json; charset=UTF-8"}
         data = json.dumps({"grantType": "refresh_token", "refreshToken": self.refresh_token})
-        response_object = requests.post(request_ref, headers=headers, data=data)
-        return response_object.json()
+        try:
+            response_object = requests.post(request_ref, headers=headers, data=data)
+            return response_object.json()
+        except:
+            return {}
