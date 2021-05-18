@@ -3,6 +3,7 @@
 from datetime import datetime
 from firestore_handler import FirestoreHandler
 import logging
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +26,7 @@ class IoMBianFirestoreHandler(FirestoreHandler):
             logger.error("DB connection not ready")
             return
         self.devices_path = f"users/{self.user_id}/devices"
+        self.db.collection(self.devices_path).document(self.device_id).update({"last_connection": int(time.time())})
         if not self.device_snapshot:
             self.device_snapshot = self.db.collection(self.devices_path).document(self.device_id).on_snapshot(self.device_update_callback)
 
@@ -36,10 +38,9 @@ class IoMBianFirestoreHandler(FirestoreHandler):
         self.add_parameters(config, config_date)
 
     def create_device(self):
-        from datetime import datetime
         if not self.db:
             self.initialize_db()
-        initial_data = { "creation_date": datetime.now().strftime("%Y/%m/%dT%H:%M:%S"), self.KEYWORD: {} }
+        initial_data = { "creation_date": datetime.now().strftime("%Y/%m/%dT%H:%M:%S"), "last_connection": 0, self.KEYWORD: {} }
         self.db.collection(self.devices_path).add(initial_data, self.device_id)
 
     def add_parameters(self, parameters_value, parameters_key):
