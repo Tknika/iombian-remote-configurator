@@ -27,8 +27,13 @@ class IoMBianFirestoreHandler(FirestoreHandler):
             return
         self.devices_path = f"users/{self.user_id}/devices"
         self.db.collection(self.devices_path).document(self.device_id).update({"last_connection": int(time.time())})
+        self.db.collection(self.devices_path).document(self.device_id).update({"connected": True})
         if not self.device_snapshot:
             self.device_snapshot = self.db.collection(self.devices_path).document(self.device_id).on_snapshot(self.device_update_callback)
+
+    def stop_db(self):
+        self.db.collection(self.devices_path).document(self.device_id).update({"connected": False})
+        super().stop_db()
 
     def upload_config(self, config):
         config_date = config.get("config_date")
