@@ -5,25 +5,29 @@ This service allows to configure the IoMBian device through a [remote applicatio
 
 ## Installation
 
+- Define project name in an environment variable:
+
+> ```PROJECT_NAME=iombian-remote-configurator```
+
 - Clone the repo into a temp folder:
 
-> ```git clone https://github.com/Tknika/iombian-remote-configurator.git /tmp/iombian-remote-configurator && cd /tmp/iombian-remote-configurator```
+> ```git clone https://github.com/Tknika/${PROJECT_NAME}.git /tmp/${PROJECT_NAME} && cd /tmp/${PROJECT_NAME}```
 
 - Create the installation folder and move the appropiate files (edit the user):
 
-> ```sudo mkdir /opt/iombian-remote-configurator```
+> ```sudo mkdir /opt/${PROJECT_NAME}```
 
-> ```sudo cp requirements.txt /opt/iombian-remote-configurator```
+> ```sudo cp requirements.txt /opt/${PROJECT_NAME}```
 
-> ```sudo cp -r src/* /opt/iombian-remote-configurator```
+> ```sudo cp -r src/* /opt/${PROJECT_NAME}```
 
-> ```sudo cp systemd/iombian-remote-configurator.service /etc/systemd/system/```
+> ```sudo cp systemd/${PROJECT_NAME}.service /etc/systemd/system/```
 
-> ```sudo chown -R iompi:iompi /opt/iombian-remote-configurator```
+> ```sudo chown -R iompi:iompi /opt/${PROJECT_NAME}```
 
 - Create the virtual environment and install the dependencies:
 
-> ```cd /opt/iombian-remote-configurator```
+> ```cd /opt/${PROJECT_NAME}```
 
 > ```python3 -m venv venv```
 
@@ -35,7 +39,7 @@ This service allows to configure the IoMBian device through a [remote applicatio
 
 - Start the script
 
-> ```sudo systemctl enable iombian-remote-configurator.service && sudo systemctl start iombian-remote-configurator.service```
+> ```sudo systemctl enable ${PROJECT_NAME}.service && sudo systemctl start ${PROJECT_NAME}.service```
 
 
 ## Author
