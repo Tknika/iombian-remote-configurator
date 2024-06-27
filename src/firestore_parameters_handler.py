@@ -62,8 +62,10 @@ class FirestoreParametersHandler(FirestoreClientHandler):
         config_date = config.get("config_date")
         if not config_date:
             config_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-        config.update({"config_date": config_date})
-        self.add_parameters(config, config_date)
+            config.update({"config_date": config_date})
+
+        for key, value in config.items():
+            self.add_parameters(value, key)
 
     def create_device(self):
         self.initialize_client(notify=False)
